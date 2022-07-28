@@ -1,0 +1,62 @@
+# Initisalisation script
+
+##### System definition #####
+
+boundary	p p f
+units		real
+atom_style	full
+
+variable y_l equal 4
+variable z_l equal 4
+
+lattice	fcc 3.6149
+region		box block 			-${y_l} ${y_l}	-${z_l} ${z_l} -30 30
+
+create_box 6 box & 
+		bond/types 1 &
+		angle/types 1 &
+		extra/bond/per/atom 2 &
+		extra/angle/per/atom 1 & 
+		extra/special/per/atom 2 
+
+### Atoms' types ###
+
+variable O2 	equal 1 	# water
+variable H2 	equal 2 
+variable Cl		equal 3		# chloride
+variable K		equal 4		# potassium
+variable Cu1	equal 5		# copper
+variable Cu2	equal 6
+
+# create copper electrodes #
+region		rbotwall block 		-${y_l} ${y_l}	-${z_l} ${z_l} -24 -23 
+region		rtopwall block 		-${y_l} ${y_l}	-${z_l} ${z_l} 23  24
+
+create_atoms 	${Cu1} region rbotwall
+create_atoms 	${Cu2} region rtopwall
+
+# create the fluid #
+region		rliquid block 		 -${y_l} ${y_l}	-${z_l} ${z_l} -22.5 	22.5
+lattice		sc 4
+
+molecule 	h2omol 	H2O.txt
+
+create_atoms 	0 region rliquid mol h2omol 482793
+
+# deposit ions in between water lattice
+fix		dep1 all deposit 37 ${K}	1 58514 region rliquid near 0.5 			attempt 20000
+fix		dep2 all deposit 37 ${Cl}	1 58524 region rliquid near 0.5 			attempt 20000
+
+include parameters.lammps
+
+##### Simulation settings #####
+
+#dump 			dmp all image 37 dump.*.jpg type type
+#dump 			dmp2 all dcd 1 dump.01.dcd
+#dump_modify    dmp2 unwrap yes
+dump 			dmp3 all atom 1 dump.01.lammpstrj
+
+##### Run #####
+
+run		37
+write_data	data.01.lammps nocoeff

@@ -1,0 +1,70 @@
+##### Initialisation #####
+##########################
+
+### Atoms' types ###
+
+variable C1		equal 1		# graphene
+variable C2		equal 2
+variable O2 	equal 3 	# water
+variable H2 	equal 4 
+variable Cl		equal 5
+variable K		equal 6		# potassium
+
+##### System definition #####
+
+boundary	p p f
+units		real
+atom_style	full
+
+bond_style harmonic
+angle_style harmonic
+
+read_data	data.04.lammps
+
+include parameters.lammps
+
+neigh_modify delay 0 every 1 check yes
+
+##### Simulation settings #####
+
+group		gH2O		type ${O2} ${H2}
+group 		gshake		type ${O2} ${H2}
+group		gK	 		type ${K}
+group		gliquid 	type ${O2} ${H2} ${Cl} ${K} 
+group		gbotwall 	type ${C1}
+group		gtopwall 	type ${C2}
+
+neigh_modify 	exclude group gtopwall gtopwall
+neigh_modify 	exclude group gbotwall gbotwall
+neigh_modify 	exclude group gbotwall gtopwall
+
+#dump 			dmp2 all atom 2000 dump.04.lammpstrj
+dump 			dmp3 all custom 10000 dumpq.04.lammpstrj id type xs ys zs q
+
+set type ${Cl}  charge  -1.000000
+set type ${K}	charge 	1.000000
+
+##### Run #####
+
+variable Temp equal 300
+
+velocity             gbotwall set 0.0 0.0 0.0 units box
+velocity             gtopwall set 0.0 0.0 0.0  units box
+
+fix		setf1 gbotwall setforce 0 0 0
+fix		setf2 gtopwall setforce 0 0 0
+
+fix		shkf  gshake shake 1.0e-6 1000 0 b 1 a 1
+
+timestep 1.0
+
+fix 	nvtf gliquid nvt temp ${Temp} ${Temp} $(100*dt)
+thermo		 1000
+
+run			 1000
+write_data	 data.041.lammps
+run			 1000
+write_data	 data.042.lammps
+
+run			 3000
+write_data	 data.04.lammps

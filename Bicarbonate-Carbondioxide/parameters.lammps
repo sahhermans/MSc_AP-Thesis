@@ -1,0 +1,207 @@
+### Masses ###
+
+mass ${O2} 	15.999
+mass ${H2} 	 1.008
+mass ${C} 	12.011
+mass ${O}  	15.999
+mass ${O6} 	15.999
+mass ${C5} 	12.011
+mass ${O4} 	15.999
+mass ${O5} 	15.999
+mass ${H6} 	 1.008
+mass ${K}  	39.098
+mass ${Cu1} 63.546
+mass ${Cu2} 63.546
+
+### Charges ###
+
+set type ${O2} 	charge 	-0.8476
+set type ${H2} 	charge 	0.4238
+set type ${C} 	charge 	0.651200
+set type ${O} 	charge	-0.325600
+set type ${O6} 	charge 	-0.5719000
+set type ${C5} 	charge 	0.4976000
+set type ${O4} 	charge 	-0.6492500
+set type ${O5} 	charge 	-0.6492500
+set type ${H6}	charge 	0.3728000
+set type ${K}	charge 	1.000000
+
+### Covalent bonds ###
+
+bond_style harmonic
+# water 		O-H
+bond_coeff 1 	1000000 	1.0
+
+# carbondioxide C-O
+bond_coeff 2 	1008.95 	1.162
+
+# bicarbonate 	C5-O6
+bond_coeff 3 	450.00		1.3640
+# bicarbonate 	C5-O4
+bond_coeff 4	656.00		1.2500
+# bicarbonate 	C5-O5
+bond_coeff 5	656.00		1.2500
+# bicarbonate 	O6-H6
+bond_coeff 6	5530000.00		0.9645
+
+### Covalent angles parameters ###
+
+angle_style harmonic
+# water
+angle_coeff 1 	1000000 		109.47
+
+# carbondioxide
+angle_coeff 2 	54.00335	 	180.0
+
+# bicarbonate O6-C5-O4
+angle_coeff 3	80.00			121.000
+# bicarbonate O6-C5-O5				
+angle_coeff 4	80.00			121.000
+# bicarbonate C5-O6-H6
+angle_coeff 5	35.00			113.000
+# bicarbonate O5-C5-O4
+angle_coeff 6	80.00			126.000
+
+### Covalent dihedrals parameters ###
+
+dihedral_style opls
+# bicarbonate H6-O6-C5-O4
+dihedral_coeff 1 	 0.000      5.500      0.000      0.000
+# bicarbonate H6-O6-C5-O5
+dihedral_coeff 2	 0.000      5.500      0.000      0.000
+
+improper_style cvff
+# bicarbonate O6-C5-O4-O5
+improper_coeff 1 10.500 -1 2
+
+### pair potentials ###
+
+variable rcoul equal 10.
+
+pair_style hybrid/overlay coul/long ${rcoul} lj/cut ${rcoul} 
+pair_modify mix geometric
+
+pair_coeff * * coul/long
+
+# water
+pair_coeff ${O2} ${O2}	  lj/cut 		0.1554253 		3.165492
+pair_coeff ${H2} ${H2}	  lj/cut 		0.0000			0.000000
+pair_coeff ${O2} ${H2}	  lj/cut 		0.0000			0.000000
+
+# carbondioxide
+pair_coeff ${C} ${C} 	  lj/cut 		0.05589771		2.757
+pair_coeff ${O} ${O} 	  lj/cut  		0.1599828		3.033
+pair_coeff ${C} ${O}	  lj/cut	 	0.09456648		2.892
+
+# potassium 
+pair_coeff ${K} ${K} 	  lj/cut 		0.4297054		2.83840332
+
+# copper
+pair_coeff ${Cu1} ${Cu1}  lj/cut		4.7201			2.3306
+pair_coeff ${Cu2} ${Cu2}  lj/cut		4.7201			2.3306
+pair_coeff ${Cu1} ${Cu2}  lj/cut		4.7201			2.3306
+
+# bicarbonate
+pair_coeff ${C5} ${C5}    lj/cut		0.0700			3.550000
+pair_coeff ${O4} ${O4}	  lj/cut		0.2100			2.960000
+pair_coeff ${O5} ${O5}	  lj/cut		0.2100			2.960000
+pair_coeff ${O6} ${O6}	  lj/cut		0.1700			3.120000
+pair_coeff ${H6} ${H6} 	  lj/cut		0.0000			0.000000
+pair_coeff ${O6} ${C5}    lj/cut		0.109087121		3.328062
+pair_coeff ${C5} ${O4}    lj/cut		0.121243557		3.241605
+pair_coeff ${C5} ${O5}    lj/cut		0.121243557		3.241605
+pair_coeff ${C5} ${H6}    lj/cut		0.0000			0.000000
+pair_coeff ${O4} ${O5}	  lj/cut		0.2100			2.960000
+pair_coeff ${O6} ${O4}	  lj/cut		0.188944436		3.038947
+pair_coeff ${O4} ${H6}	  lj/cut		0.0000			0.000000
+pair_coeff ${O6} ${O5}	  lj/cut		0.188944436		3.038947
+pair_coeff ${O5} ${H6}	  lj/cut		0.0000			0.000000
+pair_coeff ${O6} ${H6}	  lj/cut		0.0000			0.000000
+
+
+# water with carbondioxide
+pair_coeff ${O2} ${O}	  lj/cut 		0.1576875857	3.098538
+pair_coeff ${O2} ${C}	  lj/cut 		0.0932090036	2.954194
+pair_coeff ${H2} ${O}	  lj/cut 		0.0000			0.000000
+pair_coeff ${H2} ${C}	  lj/cut 		0.0000			0.000000
+
+# water with potassium
+pair_coeff ${O2} ${K}	  lj/cut 		0.2584319836	2.997489
+pair_coeff ${H2} ${K}	  lj/cut 		0.0000			0.000000
+
+# water with copper
+pair_coeff ${O2} ${Cu1}   lj/cut		0.8565179266	2.716155
+pair_coeff ${O2} ${Cu2}   lj/cut		0.8565179266	2.716155
+pair_coeff ${H2} ${Cu1}	  lj/cut 		0.0000			0.000000
+pair_coeff ${H2} ${Cu2}	  lj/cut 		0.0000			0.000000
+
+# water with bicarbonate
+pair_coeff ${O2} ${C5}    lj/cut		0.1043061408	3.352238
+pair_coeff ${O2} ${O4}    lj/cut		0.1806635353	3.061022
+pair_coeff ${O2} ${O5}    lj/cut		0.1806635353	3.061022
+pair_coeff ${O2} ${O6}    lj/cut		0.1625493802	3.142664
+pair_coeff ${O2} ${H6}    lj/cut		0.0000			0.000000
+pair_coeff ${H2} ${C5}    lj/cut		0.0000			0.000000
+pair_coeff ${H2} ${O4}    lj/cut		0.0000			0.000000
+pair_coeff ${H2} ${O5}    lj/cut		0.0000			0.000000
+pair_coeff ${H2} ${O6}    lj/cut		0.0000			0.000000
+pair_coeff ${H2} ${H6}    lj/cut		0.0000			0.000000
+
+
+# carbondioxide with potassium
+pair_coeff ${O} ${K}	  lj/cut 		0.2621935794	2.93408883
+pair_coeff ${C} ${K}	  lj/cut 		0.1549824114	2.79740558
+
+# carbondioxide with copper
+pair_coeff ${O} ${Cu1}	  lj/cut 		0.8689849333	2.65870
+pair_coeff ${C} ${Cu1}	  lj/cut 		0.5136562868	2.53485
+pair_coeff ${O} ${Cu2}	  lj/cut 		0.8689849333	2.65870
+pair_coeff ${C} ${Cu2}	  lj/cut 		0.5136562868	2.53485
+
+# carbondioxide with bicarbonate
+pair_coeff ${C}  ${C5}	  lj/cut		0.0625527		3.12847
+pair_coeff ${C}  ${O4}    lj/cut	 	0.1083444		2.856697
+pair_coeff ${C}  ${O5}    lj/cut	 	0.1083444		2.856697
+pair_coeff ${C}  ${O6}    lj/cut	 	0.0974813		2.932889
+pair_coeff ${C}  ${H6}	  lj/cut		0.0000			0.000000
+pair_coeff ${O}  ${C5}    lj/cut	 	0.1058244		3.281334
+pair_coeff ${O}  ${O4}	  lj/cut	 	0.1832932		2.996278
+pair_coeff ${O}  ${O5}	  lj/cut	 	0.1832932		2.996278
+pair_coeff ${O}  ${O6}	  lj/cut	 	0.1649154		3.076192
+pair_coeff ${O}  ${H6}	  lj/cut	 	0.0000			0.000000
+
+
+# potassium with copper
+pair_coeff ${K} ${Cu1}	  lj/cut 		1.424167286		2.57199976
+pair_coeff ${K} ${Cu2}	  lj/cut 		1.424167286		2.57199976
+
+# potassium with bicarbonate 
+pair_coeff ${C5} ${K}	  lj/cut		0.1734340739	3.17432383
+pair_coeff ${O4} ${K}	  lj/cut		0.3003966278	2.898564097
+pair_coeff ${O5} ${K}	  lj/cut		0.3003966278	2.898564097
+pair_coeff ${O6} ${K} 	  lj/cut		0.2702774833	2.97587271
+pair_coeff ${H6} ${K}	  lj/cut		0.0000			0.000000
+
+
+# copper with bicarbonate
+pair_coeff ${C5} ${Cu1}   lj/cut		0.5748104035	2.87639
+pair_coeff ${O4} ${Cu1}   lj/cut		0.9956008236	2.62651
+pair_coeff ${O5} ${Cu1}   lj/cut		0.9956008236	2.62651
+pair_coeff ${O6} ${Cu1}   lj/cut		0.8957773161	2.69657
+pair_coeff ${H6} ${Cu1}   lj/cut		0.0000			0.000000
+pair_coeff ${C5} ${Cu2}   lj/cut		0.5748104035	2.87639
+pair_coeff ${O4} ${Cu2}   lj/cut		0.9956008236	2.62651
+pair_coeff ${O5} ${Cu2}   lj/cut		0.9956008236	2.62651
+pair_coeff ${O6} ${Cu2}   lj/cut		0.8957773161	2.69657
+pair_coeff ${H6} ${Cu2}   lj/cut		0.0000			0.000000
+
+
+### scaling ###
+
+special_bonds lj 0.    0.     0.5    coul 0.   0.    0.5
+
+### reciprocal space ###
+
+kspace_style pppm 1.0e-4
+kspace_modify fftbench no
+kspace_modify slab 3.0

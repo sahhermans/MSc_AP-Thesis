@@ -1,0 +1,27 @@
+##### Initialisation #####
+##########################
+
+### Atoms' types ###
+
+variable C1		equal 1		# graphene
+variable C2		equal 2
+variable O2 	equal 3 	# water
+variable H2 	equal 4 
+variable Cl		equal 5
+variable K		equal 6		# potassium
+
+##### System definition #####
+
+boundary	p p f
+units		real
+atom_style	full
+
+bond_style harmonic
+angle_style harmonic
+
+read_data	data.02.lammps
+
+include parameters.lammps
+
+run 0
+write_data	 data.04.lammps

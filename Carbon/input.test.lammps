@@ -1,0 +1,56 @@
+##### Initialisation #####
+##########################
+
+##### System definition #####
+
+boundary	p p f
+units		real
+atom_style	full
+
+variable y_l equal 4
+variable z_l equal 4
+
+lattice	fcc 3.6149
+region		box block 			-${y_l} ${y_l}	-${z_l} ${z_l} -30 30
+
+create_box 6 box & 
+		bond/types 1 &
+		angle/types 1 &
+		extra/bond/per/atom 2 &
+		extra/angle/per/atom 1 & 
+		extra/special/per/atom 2 
+
+### Atoms' types ###
+variable C1		equal 1		# graphene
+variable C2		equal 2
+variable O2 	equal 3 	# water
+variable H2 	equal 4 
+variable Cl		equal 5
+variable K		equal 6		# potassium
+
+read_data data.test.lammps nocoeff add append
+
+region		rliquid block 		 -${y_l} ${y_l}	-${z_l} ${z_l} -22.5 	22.5
+lattice		sc 4
+
+molecule 	h2omol 	H2O.txt
+
+create_atoms 	0 region rliquid mol h2omol 482793
+
+fix		dep1 all deposit 56 0	 	1 56514 region rliquid near 0.5 mol h2omol attempt 20000
+fix		dep2 all deposit 86 ${K}	1 58514 region rliquid near 0.5 			attempt 20000
+fix		dep3 all deposit 86 ${Cl}	1 58524 region rliquid near 0.5 			attempt 20000
+
+include parameters.lammps
+
+##### Simulation settings #####
+
+#dump 			dmp all image 37 dump.*.jpg type type
+#dump 			dmp2 all dcd 1 dump.01.dcd
+#dump_modify    dmp2 unwrap yes
+dump 			dmp3 all atom 86 dump.01.lammpstrj
+
+##### Run #####
+
+run		86
+write_data	data.01.lammps nocoeff

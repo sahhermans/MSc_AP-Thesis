@@ -1,0 +1,85 @@
+# ethanol at a nacl surface
+###############	variables
+variable O2 	equal 1 	# water
+variable H2 	equal 2 
+variable Cl		equal 3
+variable K		equal 4		# potassium
+variable Cu1	equal 5		# copper
+variable Cu2	equal 6
+
+variable	tem equal 298 # desired temperature (K)
+variable	Temp equal 298 # desired temperature (K)
+variable	k1 equal 8 # spring constant
+
+############### main parameters
+units		real # style of units (A, fs, Kcal/mol)
+atom_style	full # molecular + charge
+
+bond_style harmonic
+angle_style harmonic
+
+boundary	p p f # periodic boundary conditions
+#pair_style  	lj/cut/coul/long 10 # cut-off 1 nm
+#kspace_style	pppm 1.0e-4
+#pair_modify	mix arithmetic tail yes # eij = sqrt(ei*ej), dij = 0.5*(di+dj)
+
+############### import positions and parameters
+read_data	data.03.lammps
+include 	parameters.lammps
+
+neigh_modify delay 0 every 1 check yes
+
+set type ${K}   charge 	1.000000
+############### groups # descriptions
+group		cu type ${Cu1} ${Cu2} # cu wall
+group		gK type ${K} # K ions
+
+group		gH2O		type ${O2} ${H2}
+group 		gshake		type ${O2} ${H2}
+group		gliquid 	type ${O2} ${H2} ${Cl} ${K} 
+group		gbotwall 	type ${Cu1}
+group		gtopwall 	type ${Cu2}
+
+group 		topull id 2482
+
+neigh_modify 	exclude group gtopwall gtopwall
+neigh_modify 	exclude group gbotwall gbotwall
+neigh_modify 	exclude group gbotwall gtopwall
+
+############### dynamics
+
+velocity             gbotwall set 0.0 0.0 0.0 units box
+velocity             gtopwall set 0.0 0.0 0.0 units box
+
+fix		setf1 gbotwall setforce 0 0 0
+fix		setf2 gtopwall setforce 0 0 0
+
+fix		shkf  gshake shake 1.0e-6 1000 0 b 1 a 1
+
+set type ${Cu1} charge -0.0104166667
+set type ${Cu2} charge 0.0104166667
+
+timestep 1.0
+
+fix 	nvtf gliquid nvt temp ${Temp} ${Temp} $(100*dt)
+
+############### output 
+thermo		10000 
+dump		dp1 all atom 25000 dump.04.lammpstrj
+
+############### run 
+variable	zave equal xcm(topull,z)
+variable	cpt loop 33
+label		loop
+variable	zdes equal -20.35+0.35*(${cpt}-1)
+fix		mytth1 topull spring tether 4 0 0 ${zdes} 0
+run		25000
+unfix	mytth1
+fix		mytth2 topull spring tether ${k1} 0 0 ${zdes} 0
+run		25000
+fix		myat1 all ave/time 10 10 100 v_zave v_zdes file position.${cpt}.dat
+run		1000000
+unfix		myat1
+unfix		mytth2
+next		cpt
+jump		input.04.lammps loop

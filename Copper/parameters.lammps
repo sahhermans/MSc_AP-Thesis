@@ -1,0 +1,90 @@
+### Masses ###
+
+mass ${O2} 	15.999
+mass ${H2} 	1.008
+mass ${Cl} 	35.453
+mass ${K}  	39.098
+mass ${Cu1} 63.546
+mass ${Cu2} 63.546
+
+### Charges ###
+
+set type ${O2} 	charge 	-0.8476
+set type ${H2} 	charge 	0.4238
+set type ${Cl}  charge  -1.000000
+set type ${K}	charge 	1.000000
+
+### Covalent bonds ###
+
+bond_style harmonic
+# water 		O-H
+bond_coeff 1 	1000000 	1.0
+
+### Covalent angles parameters ###
+
+angle_style harmonic
+# water
+angle_coeff 1 	1000000 		109.47
+
+### pair potentials ###
+
+variable rcoul equal 10.
+
+pair_style hybrid/overlay coul/long ${rcoul} lj/cut ${rcoul} 
+pair_modify mix geometric
+
+pair_coeff * * coul/long
+
+# water
+pair_coeff ${O2} ${O2}	  lj/cut 		0.1554253 		3.165492
+pair_coeff ${H2} ${H2}	  lj/cut 		0.0000			0.000000
+pair_coeff ${O2} ${H2}	  lj/cut 		0.0000			0.000000
+
+# potassium 
+pair_coeff ${K} ${K} 	  lj/cut 		0.4297054		2.838403
+
+# chloride
+pair_coeff ${Cl} ${Cl} 	  lj/cut 		0.0127850		4.830453
+
+# copper
+pair_coeff ${Cu1} ${Cu1}  lj/cut		4.7201			2.3306
+pair_coeff ${Cu2} ${Cu2}  lj/cut		4.7201			2.3306
+pair_coeff ${Cu1} ${Cu2}  lj/cut		4.7201			2.3306
+
+
+# water with potassium
+pair_coeff ${O2} ${K}	  lj/cut 		0.2584319847	2.9974893
+pair_coeff ${H2} ${K}	  lj/cut 		0.0000000000	0.0000000
+
+# water with chloride
+pair_coeff ${O2} ${Cl}	  lj/cut 		0.0445770396	3.9103402
+pair_coeff ${H2} ${Cl}	  lj/cut 		0.0000000000	0.0000000
+
+# water with copper
+pair_coeff ${O2} ${Cu1}   lj/cut		0.8565179266	2.716155
+pair_coeff ${O2} ${Cu2}   lj/cut		0.8565179266	2.716155
+pair_coeff ${H2} ${Cu1}	  lj/cut 		0.0000			0.000000
+pair_coeff ${H2} ${Cu2}	  lj/cut 		0.0000			0.000000
+
+
+# potassium with copper
+pair_coeff ${K} ${Cu1}	  lj/cut 		1.4241672860	2.5719996
+pair_coeff ${K} ${Cu2}	  lj/cut 		1.4241672860	2.5719996
+
+# potassium with chloride
+pair_coeff ${Cl} ${K}	  lj/cut 		0.0741200617	3.7028060
+
+
+# chloride with copper
+pair_coeff ${Cl} ${Cu1}	  lj/cut 		0.2456552025	3.3552725
+pair_coeff ${Cl} ${Cu2}	  lj/cut 		0.2456552025	3.3552725
+
+### scaling ###
+
+special_bonds lj 0.    0.     0.0    coul 0.   0.    0.0
+
+### reciprocal space ###
+
+kspace_style pppm 1.0e-4
+kspace_modify fftbench no
+kspace_modify slab 3.0

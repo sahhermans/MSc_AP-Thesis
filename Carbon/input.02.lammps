@@ -1,0 +1,158 @@
+##### Initialisation #####
+##########################
+
+### Atoms' types ###
+
+variable C1		equal 1		# graphene
+variable C2		equal 2
+variable O2 	equal 3 	# water
+variable H2 	equal 4 
+variable Cl		equal 5
+variable K		equal 6		# potassium
+
+##### System definition #####
+
+boundary	p p f
+units		real
+atom_style	full
+
+read_data	data.01.lammps
+
+include parameters.lammps
+
+neigh_modify delay 0 every 1 check yes
+
+##### Simulation settings #####
+
+group		gH2O		type ${O2} ${H2}
+group 		gshake		type ${O2} ${H2}
+group		gK	 		type ${K}
+group		gliquid 	type ${O2} ${H2} ${Cl} ${K} 
+group		gbotwall 	type ${C1}
+group		gtopwall 	type ${C2}
+
+neigh_modify 	exclude group gtopwall gtopwall
+neigh_modify 	exclude group gbotwall gbotwall
+neigh_modify 	exclude group gbotwall gtopwall
+
+dump			dmp2 all dcd 25000 dump.02.dcd
+dump 			dmp3 all custom 25000 dump.02.lammpstrj id type xs ys zs q
+
+thermo		 	10000
+
+set type ${Cl}  charge  -1.000000
+set type ${K}	charge 	1.000000
+
+##### Run #####
+
+variable Temp equal 300
+variable Ninit equal 15000
+variable Neq equal 50000 
+
+include parameters.lammps
+
+print ""
+print "Equilibration"
+print ""
+
+fix		setf1 gbotwall setforce  0 0 NULL
+fix		setf2 gtopwall setforce  0 0 NULL
+fix		avef1 gbotwall aveforce  NULL NULL 0.0
+fix		avef2 gtopwall aveforce  NULL NULL -0.0
+fix		shkf  gshake shake 1.0e-6 1000 0 b 1 a 1
+compute	tliqf gliquid temp
+
+timestep 0.0001
+fix 	nvtf all nvt temp ${Temp} ${Temp} $(1000000*dt)
+fix_modify nvtf temp tliqf
+fix		rctf all recenter NULL NULL INIT
+run ${Ninit}
+
+unfix nvtf
+unfix rctf
+
+timestep 0.001
+fix 	nvtf all nvt temp ${Temp} ${Temp} $(100000*dt)
+fix_modify nvtf temp tliqf
+fix		rctf all recenter NULL NULL INIT
+run			 ${Ninit}
+
+unfix nvtf
+unfix rctf
+
+timestep 0.01
+fix 	nvtf all nvt temp ${Temp} ${Temp} $(10000*dt)
+fix_modify nvtf temp tliqf
+fix		rctf all recenter NULL NULL INIT
+run			 ${Ninit}
+
+unfix nvtf
+unfix rctf
+
+timestep 0.1
+fix 	nvtf all nvt temp ${Temp} ${Temp} $(1000*dt)
+fix_modify nvtf temp tliqf
+fix		rctf all recenter NULL NULL INIT
+run			 ${Ninit}
+
+unfix nvtf
+unfix rctf
+
+timestep 1.
+fix 	nvtf all nvt temp ${Temp} ${Temp} $(100*dt)
+fix_modify nvtf temp tliqf
+fix		rctf all recenter NULL NULL INIT
+run			 ${Neq}
+
+unfix nvtf
+unfix rctf
+
+fix		avef1 gbotwall aveforce  NULL NULL 0.012792581417442168
+fix		avef2 gtopwall aveforce  NULL NULL -0.012792581417442168
+
+timestep 0.01
+fix 	nvtf all nvt temp ${Temp} ${Temp} $(10000*dt)
+fix_modify nvtf temp tliqf
+fix		rctf all recenter NULL NULL INIT
+run			 ${Ninit}
+
+unfix nvtf
+unfix rctf
+
+timestep 0.1
+fix 	nvtf all nvt temp ${Temp} ${Temp} $(1000*dt)
+fix_modify nvtf temp tliqf
+fix		rctf all recenter NULL NULL INIT
+run			 ${Ninit}
+
+unfix nvtf
+unfix rctf
+
+timestep 0.5
+fix 	nvtf all nvt temp ${Temp} ${Temp} $(200*dt)
+fix_modify nvtf temp tliqf
+fix		rctf all recenter NULL NULL INIT
+run			 ${Ninit}
+
+unfix nvtf
+unfix rctf
+
+timestep 1.
+fix 	nvtf all nvt temp ${Temp} ${Temp} $(100*dt)
+fix_modify nvtf temp tliqf
+fix		rctf all recenter NULL NULL INIT
+run			 ${Ninit}
+
+set type ${C1} charge -0.011904761904761904
+set type ${C2} charge 0.011904761904761904
+
+unfix nvtf
+unfix rctf
+
+timestep 1.
+fix 	nvtf all nvt temp ${Temp} ${Temp} $(100*dt)
+fix_modify nvtf temp tliqf
+fix		rctf all recenter NULL NULL INIT
+run			 2000000
+
+write_data	 data.02.lammps nocoeff

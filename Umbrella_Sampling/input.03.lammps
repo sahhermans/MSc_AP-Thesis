@@ -1,0 +1,68 @@
+##### Initialisation #####
+##########################
+
+### Atoms' types ###
+
+variable O2 	equal 1 	# water
+variable H2 	equal 2 
+variable Cl		equal 3
+variable K		equal 4		# potassium
+variable Cu1	equal 5		# copper
+variable Cu2	equal 6
+
+##### System definition #####
+
+boundary	p p f
+units		real
+atom_style	full
+
+bond_style harmonic
+angle_style harmonic
+dihedral_style opls
+improper_style cvff
+
+read_data	data.02.lammps
+
+include parameters.lammps
+
+neigh_modify delay 0 every 1 check yes
+
+##### Simulation settings #####
+
+group		gH2O		type ${O2} ${H2}
+group 		gshake		type ${O2} ${H2}
+group		gK	 		type ${K}
+group		gliquid 	type ${O2} ${H2} ${Cl} ${K} 
+group		gbotwall 	type ${Cu1}
+group		gtopwall 	type ${Cu2}
+
+neigh_modify 	exclude group gtopwall gtopwall
+neigh_modify 	exclude group gbotwall gbotwall
+neigh_modify 	exclude group gbotwall gtopwall
+
+dump 			dmp2 all atom 25000 dump.03.lammpstrj
+dump			dmp3 all dcd 25000 dump.03.dcd
+
+set type ${Cl}  charge  -1.000000
+set type ${K}	charge 	1.000000
+
+##### Run #####
+
+variable Temp equal 298
+
+velocity             gbotwall set 0.0 0.0 0.0 units box
+velocity             gtopwall set 0.0 0.0 0.0 units box
+
+fix		setf1 gbotwall setforce 0 0 0
+fix		setf2 gtopwall setforce 0 0 0
+
+fix		shkf  gshake shake 1.0e-6 1000 0 b 1 a 1
+
+timestep 1.0
+
+fix 	nvtf gliquid nvt temp ${Temp} ${Temp} $(100*dt)
+fix		rctf all recenter NULL NULL INIT
+thermo		 10000
+
+run			 10000000
+write_data	 data.03.lammps
