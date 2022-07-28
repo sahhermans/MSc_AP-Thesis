@@ -6,20 +6,20 @@ sets can be found. Below a list of the scripts in this
 folder can be found.
 
 3D.ipynb 		Script to train and test the developed
-				convolutional neural networks. 	
+			convolutional neural networks. 	
 FCN.ipynb		Script to train and test the developed
-				fully connected neural networks.
-CoordConv.py	Script containing convolutional neural 
-				network building blocks, containing different 
-				implementations of the coordinate convolutional 
-				layer using both PyTorch and Keras.
+			fully connected neural networks.
+CoordConv.py		Script containing convolutional neural 
+			network building blocks, containing different 
+			implementations of the coordinate convolutional 
+			layer using both PyTorch and Keras.
 p3DNets.py		Script containing convolutional neural network
-				building blocks. Example architectures given
-				are ResNet-like and VGG-like ones. VGG-like nets
-				are not recommended, due to the spatial information
-				destroying pooling layers. The ResNet-like network
-				without pooling is the best performing one, 
-				currently.
+			building blocks. Example architectures given
+			are ResNet-like and VGG-like ones. VGG-like nets
+			are not recommended, due to the spatial information
+			destroying pooling layers. The ResNet-like network
+			without pooling is the best performing one, 
+			currently.
 
 
 It is recommended to move towards transformer architectures,
