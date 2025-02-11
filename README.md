@@ -11,3 +11,5 @@ Authored by Sebastiaan Hermans, from the MSc Applied Physics at Delft University
 `Neural_Networks` Folder containing some of the (examples of) files used during the machine learning part of the project.
 
 `Umbrella_Sampling` This folder contains files that can be used for performing umbrella sampling.
+
+'AP_MSc_Thesis_Sebastiaan_Hermans.pdf' The final version of the thesis.
