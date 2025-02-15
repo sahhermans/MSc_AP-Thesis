@@ -14,4 +14,4 @@ Authored by Sebastiaan Hermans, from the MSc Applied Physics at Delft University
 
 `AP_MSc_Thesis_Sebastiaan_Hermans.pdf` The final version of the thesis.
 
-`AP_MSc_Thesis-Presentation` PowerPoint presentation of the thesis.
+`AP_MSc_Thesis-Presentation.pptx` PowerPoint presentation of the thesis.
